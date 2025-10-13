@@ -1,0 +1,49 @@
+.arena {
+    text-align: center;
+    margin-top: 2rem;
+    color: white;
+    background-color: black;
+    height: 100vh;
+    padding-top: 2rem;
+}
+
+.arena-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.ring {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    border: 4px solid red;
+    border-radius: 20px;
+    padding: 3rem;
+    margin: 0 auto;
+    width: 80%;
+    
+}       
+
+.boxer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+}   
+
+.red-corner p {
+    color: red;
+}   
+
+.blue-corner p {
+    color:blue;
+}   
+
+.vs {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}   
+
