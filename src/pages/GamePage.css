@@ -168,7 +168,7 @@
 .ko-flash {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle, rgba(255,120,0,0.4), rgba(0,0,0,0.8));
+  background: radial-gradient(circle, rgba(255,120,0,0.4), rgba(0,0,0,0.7));
   animation: koFlash 0.5s ease-out;
   z-index: 999;
   pointer-events: none;
