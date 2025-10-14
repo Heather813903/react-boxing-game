@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./GamePage.css";
 
 function GamePage() {
@@ -6,10 +6,9 @@ function GamePage() {
   const [cpuHealth, setCpuHealth] = useState(100);
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
-  const [score] = useState(0);
   const [playerScore, setPlayerScore] = useState(0);
   const [cpuScore, setCpuScore] = useState(0);
-
+  const [difficulty, setDifficulty] = useState(null); // New state for difficulty
   const handlePunch = () => {
     if (gameOver) return;
 
@@ -17,13 +16,32 @@ function GamePage() {
     setCpuHealth((prev) => Math.max(prev - playerDamage, 0));
   };
 
+    const getCpuStats = useCallback(() => {
+        switch (difficulty) {
+            case "Easy":
+                return { damage: 10, delay: 1500 };
+            case "Medium":
+                return { damage: 15, delay: 1000 };
+            case "Hard":
+                return { damage: 20, delay: 750 };
+            default:
+                return { damage: 0, delay: 0 };
+        }
+    }, [difficulty]);
+
   useEffect(() => {
-    if (cpuHealth <= 0 && !gameOver) {
-      setGameOver(true);
-      setWinner("Player");
-      setPlayerScore((prev) => prev + 1); // award point to player
+    if (cpuHealth < 100 && cpuHealth > 0 && !gameOver && difficulty) {
+      const { damage, delay } = getCpuStats();
+
+      const timeout = setTimeout(() => {
+        setPlayerHealth((prev) => Math.max(prev - damage, 0));
+      }, delay);
+
+      return () => clearTimeout(timeout);
     }
-  }, [cpuHealth, gameOver]);
+}, [cpuHealth, difficulty, gameOver, getCpuStats]);
+
+      
 
   useEffect(() => {
     if (playerHealth <= 0 && !gameOver) {
@@ -32,6 +50,14 @@ function GamePage() {
       setCpuScore((prev) => prev + 1); // award point to CPU
     }
   }, [playerHealth, gameOver]);
+
+  useEffect(() => {
+    if (cpuHealth <= 0 && !gameOver) {
+      setGameOver(true);
+      setWinner("Player");
+      setPlayerScore((prev) => prev + 1); // award point to Player
+    }
+  }, [cpuHealth, gameOver]);
 
   useEffect(() => {
     if (!gameOver) {
@@ -51,6 +77,18 @@ function GamePage() {
     setWinner(null);
   };
 
+    if (!difficulty) {  
+        return (
+            <div className="difficulty-screen">
+                <h2>Select Difficulty</h2>
+                <div className="difficulty-buttons">    
+                    <button onClick={() => setDifficulty("Easy")}>Easy</button>
+                    <button onClick={() => setDifficulty("Medium")}>Medium</button>
+                    <button onClick={() => setDifficulty("Hard")}>Hard</button>
+                </div>
+            </div>
+        );
+    }
   return (
     <div className="arena">
       <h2 className="arena-title">Welcome to the Boxing Arena!</h2>
@@ -58,7 +96,7 @@ function GamePage() {
         <p>Player Score: {playerScore}</p>
         <p>CPU Score: {cpuScore}</p>
       </div>
-      <p className="scoreboard">Score: {score}</p>
+      
       <div className="ring">
         <div className="boxer red-corner">
           <p>Player</p>
