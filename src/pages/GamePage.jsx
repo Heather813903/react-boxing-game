@@ -8,12 +8,20 @@ function GamePage() {
   const [winner, setWinner] = useState(null);
   const [playerScore, setPlayerScore] = useState(0);
   const [cpuScore, setCpuScore] = useState(0);
-  const [difficulty, setDifficulty] = useState(null); // New state for difficulty
+  const [difficulty, setDifficulty] = useState(null); 
+  const [playerHit, setPlayerHit] = useState(false);
+  const [cpuHit, setCpuHit] = useState(false);
+
   const handlePunch = () => {
     if (gameOver) return;
 
     const playerDamage = Math.floor(Math.random() * 11) + 8; // 8-18
+
+    setCpuHit(true);
+    setTimeout(() => setCpuHit(false), 300); 
+     
     setCpuHealth((prev) => Math.max(prev - playerDamage, 0));
+   
   };
 
     const getCpuStats = useCallback(() => {
@@ -32,9 +40,11 @@ function GamePage() {
   useEffect(() => {
     if (cpuHealth < 100 && cpuHealth > 0 && !gameOver && difficulty) {
       const { damage, delay } = getCpuStats();
-
       const timeout = setTimeout(() => {
-        setPlayerHealth((prev) => Math.max(prev - damage, 0));
+        setPlayerHit(true);
+        setTimeout(() => setPlayerHit(false), 300); // brief hit animation
+
+        setPlayerHealth((prev) => Math.max(prev - damage, 0));    
       }, delay);
 
       return () => clearTimeout(timeout);
@@ -89,45 +99,63 @@ function GamePage() {
             </div>
         );
     }
+
+    const renderKOFlash = () => {
+        if (!gameOver) return null;
+        return <div className="ko-flash">K.O.!</div>;
+    };
+
   return (
     <div className="arena">
       <h2 className="arena-title">Welcome to the Boxing Arena!</h2>
       <div className="scoreboard">
         <p>Player Score: {playerScore}</p>
         <p>CPU Score: {cpuScore}</p>
+        {renderKOFlash()}
       </div>
       
       <div className="ring">
-        <div className="boxer red-corner">
-          <p>Player</p>
-          <div className="health-bar">
-            <div
-              className="health-fill"
-              style={{
-                width: `${playerHealth}%`,
-                backgroundColor:
-                  playerHealth > 50 ? "green" : playerHealth > 20 ? "orange" : "red",
-              }}
-            />
-          </div>
-        </div>
+  {/* Player side */}
+  <div className={`boxer red-corner ${playerHit ? "hit" : ""}`}>
+    <p>Player</p>
+    <div className="health-bar">
+      <div
+        className={`health-fill ${playerHit ? "hit" : ""}`}
+        style={{
+          width: `${playerHealth}%`,
+          backgroundColor:
+            playerHealth > 50
+              ? "green"
+              : playerHealth > 20
+              ? "orange"
+              : "red",
+        }}
+      />
+    </div>
+  </div>
 
-        <div className="vs">VS</div>
+  <div className="vs">VS</div>
 
-        <div className="boxer blue-corner">
-          <p>CPU</p>
-          <div className="health-bar">
-            <div
-              className="health-fill"
-              style={{
-                width: `${cpuHealth}%`,
-                backgroundColor:
-                  cpuHealth > 50 ? "green" : cpuHealth > 20 ? "orange" : "red",
-              }}
-            />
-          </div>
-        </div>
-      </div>
+  {/* CPU side */}
+  <div className={`boxer blue-corner ${cpuHit ? "hit" : ""}`}>
+    <p>CPU</p>
+    <div className="health-bar">
+      <div
+        className={`health-fill ${cpuHit ? "hit" : ""}`}
+        style={{
+          width: `${cpuHealth}%`,
+          backgroundColor:
+            cpuHealth > 50
+              ? "green"
+              : cpuHealth > 20
+              ? "orange"
+              : "red",
+        }}
+      />
+    </div>
+  </div>
+</div>
+
 
       {!gameOver ? (
         <button className="punch-button" onClick={handlePunch}>
