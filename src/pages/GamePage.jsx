@@ -6,6 +6,9 @@ function GamePage() {
   const [cpuHealth, setCpuHealth] = useState(100);
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
+  const [score] = useState(0);
+  const [playerScore, setPlayerScore] = useState(0);
+  const [cpuScore, setCpuScore] = useState(0);
 
   const handlePunch = () => {
     if (gameOver) return;
@@ -18,6 +21,7 @@ function GamePage() {
     if (cpuHealth <= 0 && !gameOver) {
       setGameOver(true);
       setWinner("Player");
+      setPlayerScore((prev) => prev + 1); // award point to player
     }
   }, [cpuHealth, gameOver]);
 
@@ -25,6 +29,7 @@ function GamePage() {
     if (playerHealth <= 0 && !gameOver) {
       setGameOver(true);
       setWinner("CPU");
+      setCpuScore((prev) => prev + 1); // award point to CPU
     }
   }, [playerHealth, gameOver]);
 
@@ -49,6 +54,11 @@ function GamePage() {
   return (
     <div className="arena">
       <h2 className="arena-title">Welcome to the Boxing Arena!</h2>
+      <div className="scoreboard">
+        <p>Player Score: {playerScore}</p>
+        <p>CPU Score: {cpuScore}</p>
+      </div>
+      <p className="scoreboard">Score: {score}</p>
       <div className="ring">
         <div className="boxer red-corner">
           <p>Player</p>

@@ -102,4 +102,20 @@
     background-color: darkblue;
 }
 
+.scoreboard {
+    display: flex;
+    justify-content: space-around;
+    gap: 3rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    color: yellow;
+
+}
+
+.scoreboard p {
+    font-size: 1.2rem;
+    color: greenyellow;
+    text-shadow: 1px 1px black;
+    
+}
 }
