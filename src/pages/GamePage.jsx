@@ -100,18 +100,20 @@ function GamePage() {
         );
     }
 
-    const renderKOFlash = () => {
+    const renderKnockout = () => {
         if (!gameOver) return null;
-        return <div className="ko-flash">K.O.!</div>;
+        return <div className="knockout-overlay">
+          <h1>KNOCKOUT!!</h1>
+        </div>;
     };
 
   return (
     <div className="arena">
-      <h2 className="arena-title">Welcome to the Boxing Arena!</h2>
+      <h1 className="arena-title">Let's get ready to REACT!</h1>
       <div className="scoreboard">
         <p>Player Score: {playerScore}</p>
         <p>CPU Score: {cpuScore}</p>
-        {renderKOFlash()}
+        {renderKnockout()}
       </div>
       
       <div className="ring">
