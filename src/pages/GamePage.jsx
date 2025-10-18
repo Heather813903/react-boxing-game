@@ -11,6 +11,8 @@ function GamePage() {
   const [difficulty, setDifficulty] = useState(null); 
   const [playerHit, setPlayerHit] = useState(false);
   const [cpuHit, setCpuHit] = useState(false);
+  const [roundCount, setRoundCount] = useState(0);
+  
 
   const handlePunch = () => {
     if (gameOver) return;
@@ -57,7 +59,8 @@ function GamePage() {
     if (playerHealth <= 0 && !gameOver) {
       setGameOver(true);
       setWinner("CPU");
-      setCpuScore((prev) => prev + 1); // award point to CPU
+      setCpuScore((prev) => prev + 1);
+      setRoundCount((prev) => prev +1); // award point to CPU
     }
   }, [playerHealth, gameOver]);
 
@@ -65,9 +68,24 @@ function GamePage() {
     if (cpuHealth <= 0 && !gameOver) {
       setGameOver(true);
       setWinner("Player");
-      setPlayerScore((prev) => prev + 1); // award point to Player
+      setPlayerScore((prev) => prev + 1);
+      setRoundCount ((prev) => prev +1); // award point to Player
     }
   }, [cpuHealth, gameOver]);
+
+  useEffect(() => {
+    if (roundCount > 8) {
+      const finalWinner =
+        playerScore > cpuScore
+         ? "Player" :
+          cpuScore > playerScore 
+          ? "CPU" 
+          : "Draw";
+      setWinner(finalWinner);
+      setGameOver(true);
+    }
+  }, [roundCount, playerScore, cpuScore]);
+     
 
   useEffect(() => {
     if (!gameOver) {
@@ -81,6 +99,11 @@ function GamePage() {
     }, [gameOver]);
 
   const handleRestart = () => {
+    if (roundCount >= 8) {
+        setPlayerScore(0);
+        setCpuScore(0);
+        setRoundCount(0);
+    }
     setPlayerHealth(100);
     setCpuHealth(100);
     setGameOver(false);
@@ -102,9 +125,22 @@ function GamePage() {
 
     const renderKnockout = () => {
         if (!gameOver) return null;
-        return <div className="knockout-overlay">
-          <h1>KNOCKOUT!!</h1>
-        </div>;
+
+        if (roundCount >= 8) {    
+          return (
+             <div className="knockout-overlay">
+               <h1>
+                {winner === "Draw" ? "DRAW GAME!" : `${winner.toUpperCase()} IS CHAMPION!` }
+              </h1>
+        </div>
+      );
+    }
+
+        return (
+            <div className="knockout-overlay">
+                <h1>KNOCKOUT!!</h1>
+            </div>
+        );
     };
 
   return (
