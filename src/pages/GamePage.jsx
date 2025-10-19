@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback, use } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./GamePage.css";
-
 function GamePage() {
   const [playerHealth, setPlayerHealth] = useState(100);
   const [cpuHealth, setCpuHealth] = useState(100);
@@ -13,6 +12,7 @@ function GamePage() {
   const [playerHit, setPlayerHit] = useState(false);
   const [cpuHit, setCpuHit] = useState(false);
   const [roundCount, setRoundCount] = useState(0);
+  
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,6 +28,7 @@ function GamePage() {
   // Player attack
   const handlePunch = () => {
     if (gameOver) return;
+    
     const playerDamage = Math.floor(Math.random() * 11) + 8; // 8–18
     setCpuHit(true);
     setTimeout(() => setCpuHit(false), 300);
@@ -38,9 +39,9 @@ function GamePage() {
   const getCpuStats = useCallback(() => {
     switch (difficulty) {
       case "Easy":
-        return { damage: 10, delay: 1500 };
+        return { damage: 10, delay: 2000 };
       case "Medium":
-        return { damage: 15, delay: 1000 };
+        return { damage: 13, delay: 1300 };
       case "Hard":
         return { damage: 20, delay: 750 };
       default:
@@ -50,16 +51,31 @@ function GamePage() {
 
   // CPU attacks automatically
   useEffect(() => {
-    if (cpuHealth < 100 && cpuHealth > 0 && !gameOver && difficulty) {
-      const { damage, delay } = getCpuStats();
-      const timeout = setTimeout(() => {
-        setPlayerHit(true);
-        setTimeout(() => setPlayerHit(false), 300);
-        setPlayerHealth((prev) => Math.max(prev - damage, 0));
-      }, delay);
-      return () => clearTimeout(timeout);
-    }
-  }, [cpuHealth, difficulty, gameOver, getCpuStats]);
+    if (gameOver || !difficulty) return;
+
+    const { damage, delay } = getCpuStats();
+    const startDelay = Math.random() < 0.5 ? 0 : 1500; // 50% chance CPU starts first
+
+    const cpuInterval = setInterval(() => {
+      const cpuDamage = Math.floor(Math.random() * (damage / 2)) + damage / 2;
+      setPlayerHit(true);
+      setTimeout(() => setPlayerHit(false), 300);
+      setPlayerHealth((prev) => Math.max(prev - cpuDamage, 0));
+    }, delay);
+
+    // randomize the first attack timing
+    const timeout = setTimeout(() => {
+      const cpuDamage = Math.floor(Math.random() * (damage / 2)) + damage / 2;
+      setPlayerHit(true);
+      setTimeout(() => setPlayerHit(false), 300);
+      setPlayerHealth((prev) => Math.max(prev - cpuDamage, 0));
+    }, startDelay);
+
+    return () => {
+      clearInterval(cpuInterval);
+      clearTimeout(timeout);
+    };
+  }, [gameOver, difficulty, getCpuStats]);
 
   // Player loses
   useEffect(() => {
@@ -81,7 +97,7 @@ function GamePage() {
     }
   }, [cpuHealth, gameOver]);
 
-  // Declare champion after 8 rounds
+  // Champion after 8 rounds
   useEffect(() => {
     if (roundCount >= 8) {
       const finalWinner =
@@ -95,7 +111,7 @@ function GamePage() {
     }
   }, [roundCount, playerScore, cpuScore]);
 
-  // Reset game logic
+  // Restart logic
   const handleRestart = () => {
     if (roundCount >= 8) {
       setPlayerScore(0);
@@ -108,8 +124,7 @@ function GamePage() {
     setWinner(null);
   };
 
-  
-  // Knockout / Champion overlay
+  // Knockout or Champion overlay
   const renderKnockout = () => {
     if (!gameOver) return null;
     if (roundCount >= 8) {
